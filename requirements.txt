@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+sqlalchemy
+requests
+beautifulsoup4
+recipe-scrapers
+google-generativeai>=0.8.3
+streamlit
+Pillow
+bashio
