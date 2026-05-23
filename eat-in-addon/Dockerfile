@@ -1,25 +1,30 @@
-FROM python:3.11-slim-bookworm
+# שימוש באימג' בסיס רשמי של Home Assistant ל-Python (תומך בכל הארכיטקטורות אוטומטית)
+FROM ghcr.io/home-assistant/amd64-base-python:3.11-alpine3.19
 
-# התקנת כלים לעיבוד תמונות ובנייה
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    libmagic1 \
-    && rm -rf /var/lib/apt/lists/*
+# התקנת כלים לעיבוד תמונות ובנייה (משתמשים ב-apk כי האימג' מבוסס Alpine, קל ומהיר בהרבה)
+RUN apk add --no-cache \
+    build-base \
+    libmagic \
+    bash
 
-WORKDIR /app
+# הגדרת תיקיית העבודה הראשית בקונטיינר
+WORKDIR /
 
-# התקנת ספריות
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# העתקת קבצי הדרישות וסקריפט ההרצה לתיקיית השורש
+COPY requirements.txt /
+COPY run.sh /
 
-# העתקת כל הקוד מהמחשב/גיט לתוך תיקיית /app בקונטיינר
-COPY . .
+# התקנת ספריות הפייתון
+RUN pip install --no-cache-dir -r /requirements.txt
+
+# העתקת תוכן תיקיית app שבגיט ישירות לתוך תיקיית app בקונטיינר
+COPY app/ /app/
 
 # מתן הרשאות הרצה לסקריפט ההפעלה
-RUN chmod a+x run.sh
+RUN chmod a+x /run.sh
 
 # חשיפת הפורט של האפליקציה עבור ה-Ingress של HA
 EXPOSE 8099
 
-# הפעלה מפורשת באמצעות Bash
-CMD [ "/bin/bash", "./run.sh" ]
+# הפעלה של הסקריפט מתיקיית השורש
+CMD [ "/bin/bash", "/run.sh" ]
