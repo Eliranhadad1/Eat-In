@@ -13,7 +13,8 @@ WORKDIR /
 # העתקת קבצי הדרישות וסקריפט ההרצה לתיקיית השורש
 COPY requirements.txt /
 COPY run.sh /
-
+# תיקון אוטומטי של סיומות שורות מ-Windows ל-Linux
+RUN sed -i 's/\r$//' /run.sh
 # התקנת ספריות הפייתון
 RUN pip install --no-cache-dir -r /requirements.txt
 
