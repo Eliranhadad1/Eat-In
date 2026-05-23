@@ -6,7 +6,7 @@ echo "Starting Eat-In Recipe Manager..."
 mkdir -p /data/media
 
 # אתחול בסיס הנתונים (מריץ את קובץ main.py שנמצא בתוך תיקיית app)
-python3 app/main.py
+python3 /app/main.py
 
 # הרצת ממשק המשתמש של Streamlit עם חסימת הגנות CORS/XSRF עבור ה-Ingress של HA
 streamlit run app/ui.py \
