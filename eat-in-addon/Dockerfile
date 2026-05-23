@@ -1,5 +1,5 @@
-# שימוש באימג' בסיס רשמי של Home Assistant מבוסס Debian (מתאים לחבילות כבדות כמו גוגל AI)
-FROM ghcr.io/home-assistant/amd64-base-debian:bookworm
+# שימוש באימג' בסיס רשמי של Home Assistant מבוסס Debian לארכיטקטורת ARM64 (מתאים ל-HA Green)
+FROM ghcr.io/home-assistant/aarch64-base-debian:bookworm
 
 # התקנת פייתון, כלי בנייה וספריות לעיבוד תמונות
 RUN apt-get update && apt-get install -y \
@@ -18,7 +18,7 @@ WORKDIR /
 COPY requirements.txt /
 COPY run.sh /
 
-# תיקול סיומות שורות למקרה שהקובץ נערך ב-Windows
+# תיקון סיומות שורות למקרה שהקובץ נערך ב-Windows
 RUN sed -i 's/\r$//' /run.sh
 
 # התקנת ספריות הפייתון (כולל הגדרת break-system-packages כי דביאן דורש את זה ב-pip הגלובלי)
