@@ -22,29 +22,32 @@ apiKey = ""
 
 # פונקציה חכמה למציאת מפתח ה-API הפעיל
 def get_effective_api_key():
-    # 1. אם המשתמש שמר את המפתח בתוך הגדרות האפליקציה (עדיפות ראשונה)
+    """קורא את מפתח ה-API ישירות מהגדרות התוסף של Home Assistant בצורה מאובטחת"""
+    import os
+    import json
+    
+    # 1. עדיפות ראשונה: קריאה מקובץ האפשרויות המאובטח של ה-Add-on ב-Home Assistant
+    options_path = "/data/options.json"
+    if os.path.exists(options_path):
+        try:
+            with open(options_path, "r", encoding="utf-8") as f:
+                options = json.load(f)
+                key = options.get("gemini_api_key")
+                if key and key.strip():
+                    return key.strip()
+        except Exception:
+            pass
+
+    # 2. עדיפות שנייה: אם המשתמש שמר את המפתח בתוך ה-session הנוכחי של האפליקציה
     if "app_api_key" in st.session_state and st.session_state.app_api_key.strip():
         return st.session_state.app_api_key.strip()
         
-    # 2. בדיקה של המשתנה המקומי בקוד
+    # 3. בדיקה של המשתנה המקומי בקוד (כגיבוי)
     clean_key = apiKey.strip() if apiKey else ""
     if clean_key and "הדבק" not in clean_key and len(clean_key) > 10:
         return clean_key
         
-    # 3. בדיקת משתנה הסביבה של המערכת
-    env_key = os.environ.get("GEMINI_API_KEY", "").strip()
-    if env_key and len(env_key) > 10:
-        return env_key
-        
-    # 4. בדיקת קובץ ההגדרות של Home Assistant
-    try:
-        with open('/data/options.json') as f:
-            ha_key = json.load(f).get('gemini_api_key', '').strip()
-            if ha_key and len(ha_key) > 10:
-                return ha_key
-    except:
-        pass
-    return ""
+    return None
 
 # פונקציה יצירתית לביצוע פנייה ישירה ל-API של גוגל באמצעות REST הכוללת Fallback חכם ונטרול אימות SSL מקומי
 def generate_recipe_via_rest_api(active_key, prompt_text, image_b64=None, mime_type=None):
